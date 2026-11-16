@@ -4,13 +4,16 @@ title: FPGA VGA Driver Project
 tags: fpga vga verilog
 categories: demo
 ---
-Add a short welcome message or introduction here. Aim to get the viewer interested in what follows! Guideline: 1 or 2 sentences. 
-
-I am adding a test sentence here at 13:24 on 21/10/2026.
+Welcome to my FPGA VGA project! This Verilog design runs on the Basys3 board and outputs a 640×480 @ 60 Hz picture.
+It uses a sync generator for the timing, a colour stripe module for the pattern, and a top module that ties it together.
 
 ## **Template VGA Design**
+<img src="https://github.com/OliwierKardynal/fpga-vga-verilog/blob/main/docs/assets/images/1000022117.png?raw=true">
 ### **Project Set-Up**
-Summarise the project set-up and design flow. Include a screenshot of your own set-up, for example see the image of my Project Summary window below. Guideline 1 short paragraph.
+The project was created in Vivado for the Basys3 board (Artix-7 xc7a35tcpg236-1) with VGATop as the top module.
+The design sources are VGATop.v, VGASync.v (horizontal and vertical counters that generate hSync, vSync and the vid_on visible-area flag) and VGAColourStripes.v (eight 80-pixel-wide colour bars chosen from the column count). A Clocking Wizard IP (clk_wiz_0) converts the board’s 100 MHz clock to the 25 MHz pixel clock. Basys3_Master.xdc was added as the constraints file to assign the clock, reset switch and VGA pins and set LVCMOS33 I/O standards. The testbench was run in simulation to check the sync timing. 
+The design then went through synthesis, implementation and bitstream generation, and the resulting .bit file was programmed onto the board through Hardware Manager.
+ This produced eight vertical colour stripes at 640×480 on the monitor.
 
 <img src="https://raw.githubusercontent.com/melgineer/fpga-vga-verilog/main/docs/assets/images/VGAPrjSum.png">
 ### **Template Code**
