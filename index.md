@@ -17,9 +17,8 @@ The design then went through synthesis, implementation and bitstream generation,
  This produced eight vertical colour stripes at 640×480 on the monitor.
 
 
-<img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/Screenshot%202026-11-23%20152307.png">
+<img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGAPrjSum2.png" alt="Vivado Project Summary">
 
-> **TODO:** This screenshot shows Synthesis as "Out-of-date". Re-run synthesis in Vivado and retake it. Also commit and push the image so it appears on the page.
 ### **Template Code**
 Outline the structure and design of the Verilog code templates you were given. What do they do? Include reference to how a VGA interface works. Guideline: 2/3 short paragraphs, consider including screenshot(s).
 
