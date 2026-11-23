@@ -61,7 +61,9 @@ Describe the synthesis & implementation outputs for your design, are there any d
 ### **Demonstration**
 If you get your own design working on the Basys3 board, take a picture! Guideline: 1-2 sentences.
 
-> **TODO:** Not done yet. Program the board with the sunset design, photograph the monitor and add it here.
+The sunset design running on the Basys3 board. The reflection bands drift down the screen, one step every two frames.
+
+<video src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGASunsetDemo.mp4" controls muted loop autoplay playsinline width="640"></video>
 
 ## **More Markdown Basics**
 > **TODO:** This section is template text (it also links images from the template author's repository). Delete it before submitting.
