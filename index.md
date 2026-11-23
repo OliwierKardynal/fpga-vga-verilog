@@ -16,7 +16,6 @@ The design sources are VGATop.v, VGASync.v (horizontal and vertical counters tha
 The design then went through synthesis, implementation and bitstream generation, and the resulting .bit file was programmed onto the board through Hardware Manager.
  This produced eight vertical colour stripes at 640×480 on the monitor.
 
-> **TODO:** Check the simulation sentence above is true. Keep it only if you ran the testbench and have a waveform screenshot.
 
 <img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/Screenshot%202026-11-23%20152307.png">
 
@@ -28,7 +27,9 @@ Outline the structure and design of the Verilog code templates you were given. W
 ### **Simulation**
 Explain the simulation process. Reference any important details, include a well-selected screenshot of the simulation. Guideline: 1/2 short paragraphs.
 
-> **TODO:** Not written yet. Run the testbench in Vivado, then add a waveform screenshot and a short explanation.
+<img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGASim.png" alt="Simulation waveform of the end of line 0">
+
+The testbench (Testbench.v) instantiates VGASync and ColourStripes, drives a clock and holds reset for two clock cycles. It clocks the design directly, so one 10 ns cycle stands in for one pixel and a full line takes 800 x 10 ns = 8 µs. The waveform above is zoomed in on the end of line 0. vid_on drops at about 6.4 µs, once col passes 639. hsync goes low at about 6.575 µs and returns high at about 7.535 µs, a pulse of 96 clock cycles. Both edges sit one clock later than the counter values in the code (657 and 753), because VGASync registers its outputs. vsync stays high here because it only goes low at line 490, about 3.9 ms in. The colour outputs show F, 8, 4 (the sky colour of my edited design), because the simulation was run after I changed the code.
 ### **Synthesis**
 Describe the synthesis and implementation processes. Consider including 1/2 useful screenshot(s). Guideline: 1/2 short paragraphs.
 
