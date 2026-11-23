@@ -49,7 +49,9 @@ Perhaps add a picture of your demo. Guideline: 1/2 sentences.
 ## **My VGA Design Edit**
 Introduce your own design idea. Consider how complex/achievabble this might be or otherwise. Reference any research you do online (use hyperlinks).
 
-> **TODO:** Not written yet. Describe the sunset idea and add at least one hyperlink to your research.
+For my own design I replaced the colour stripes with a simple picture: a sunset over water. It has an orange sky, a half-circle sun sitting on the horizon, and blue water below with yellow reflection bands that get wider towards the bottom. To make it more interesting I animated the reflection so the bands drift down the screen. I sketched the picture in Paint at 640×480 first, to work out where the shapes should go.
+
+I expected this to be achievable because only ColourStripes has to change. VGASync already gives the row and column of every pixel, so the picture can be described with simple rules. The horizon at row 300 splits sky from water, the sun is every pixel within a distance of 80 from one centre point (a circle test), and the reflection is a set of bands whose width grows with the row. The animation needs one extra counter that moves the bands down every couple of frames. The main limits are that each colour channel only has 4 bits (16 levels), so colours can only be approximated, and that the logic has to stay simple enough to finish within one 25 MHz pixel clock. For background I used the [VGA article on Wikipedia](https://en.wikipedia.org/wiki/Video_Graphics_Array) for the signal timing and the [Digilent Basys3 reference manual](https://digilent.com/reference/programmable-logic/basys-3/reference-manual) for how the board's VGA port turns 4-bit colours into voltages.
 
 ### **Code Adaptation**
 Briefly show how you changed the template code to display a different image. Demonstrate your understanding. Guideline: 1-2 short paragraphs.
