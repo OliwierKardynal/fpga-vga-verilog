@@ -50,18 +50,22 @@ Perhaps add a picture of your demo. Guideline: 1/2 sentences.
 Introduce your own design idea. Consider how complex/achievabble this might be or otherwise. Reference any research you do online (use hyperlinks).
 
 > **TODO:** Not written yet. Describe the sunset idea and add at least one hyperlink to your research.
+
 ### **Code Adaptation**
 Briefly show how you changed the template code to display a different image. Demonstrate your understanding. Guideline: 1-2 short paragraphs.
 
 > **TODO:** Not written yet. Explain how ColourStripes was changed (sun, horizon, reflection bands, drift animation) and add a short code snippet.
+
 ### **Simulation**
 Show how you simulated your own design. Are there any things to note? Demonstrate your understanding. Add a screenshot. Guideline: 1-2 short paragraphs.
 
 > **TODO:** Not done yet. Simulate the new design and add a screenshot. The drift animation only moves once per frame, so run the simulation for several frames.
+
 ### **Synthesis**
 Describe the synthesis & implementation outputs for your design, are there any differences to that of the original design? Guideline 1-2 short paragraphs.
 
 > **TODO:** Not done yet. Re-run synthesis and implementation on the new design and compare its utilisation and timing with the stripes version.
+
 ### **Demonstration**
 If you get your own design working on the Basys3 board, take a picture! Guideline: 1-2 sentences.
 
