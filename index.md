@@ -20,7 +20,6 @@ The design then went through synthesis, implementation and bitstream generation,
 <img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGAPrjSum2.png" alt="Vivado Project Summary">
 
 ### **Template Code**
-Outline the structure and design of the Verilog code templates you were given. What do they do? Include reference to how a VGA interface works. Guideline: 2/3 short paragraphs, consider including screenshot(s).
 
 A VGA monitor has no memory of the picture. It is sent one pixel at a time, left to right and top to bottom, about 60 times a second. Two sync signals tell it where it is: hsync marks the start of a new line and vsync marks the start of a new frame. Three colour signals (red, green and blue) say what colour the current pixel is. Around the visible 640×480 area there are extra blanking pixels and lines (the front porch, sync pulse and back porch), so each line is really 800 pixels and each frame 525 lines. With a 25 MHz pixel clock this gives about 59.5 frames per second.
 
@@ -28,13 +27,11 @@ VGASync generates this timing with two counters. The horizontal counter counts 0
 
 ColourStripes uses col to choose the colour. The screen is split into eight bars, each 80 pixels wide, and each bar turns the red, green and blue channels fully on or off to make black, blue, green, cyan, red, magenta, yellow and white. VGATop connects the modules together and uses the Clocking Wizard to turn the 100 MHz board clock into the 25 MHz pixel clock. It also forces the colour outputs to zero whenever vid_on is low, because the monitor needs black during the blanking periods. The Basys3 board then converts each 4-bit colour value into an analogue voltage for the VGA connector.
 ### **Simulation**
-Explain the simulation process. Reference any important details, include a well-selected screenshot of the simulation. Guideline: 1/2 short paragraphs.
 
 <img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGASim.png" alt="Simulation waveform of the end of line 0">
 
 The testbench (Testbench.v) instantiates VGASync and ColourStripes, drives a clock and holds reset for two clock cycles. It clocks the design directly, so one 10 ns cycle stands in for one pixel and a full line takes 800 x 10 ns = 8 µs. The waveform above is zoomed in on the end of line 0. vid_on drops at about 6.4 µs, once col passes 639. hsync goes low at about 6.575 µs and returns high at about 7.535 µs, a pulse of 96 clock cycles. Both edges sit one clock later than the counter values in the code (657 and 753), because VGASync registers its outputs. vsync stays high here because it only goes low at line 490, about 3.9 ms in. The colour outputs show F, 8, 4 (the sky colour of my edited design), because the simulation was run after I changed the code.
 ### **Synthesis**
-Describe the synthesis and implementation processes. Consider including 1/2 useful screenshot(s). Guideline: 1/2 short paragraphs.
 
 <img src="https://raw.githubusercontent.com/OliwierKardynal/fpga-vga-verilog/main/docs/assets/images/VGAImplDevice.png" alt="Implemented design in the Vivado Device view">
 
@@ -42,19 +39,16 @@ Synthesis turns the Verilog into a netlist of basic FPGA building blocks. The lo
 
 Implementation then fits that netlist onto the real Artix-7 chip. It optimises the design, places each LUT and flip-flop in a physical location, and routes the wires between them. The image above shows the placed design in Vivado's Device view. It is a small design, so it only uses a tiny part of the chip. After routing, Vivado checks timing, which means every signal must settle within one clock period. The design passed with positive slack (worst case about 28 ns). The last step is writing the bitstream, the file that configures the FPGA.
 ### **Demonstration**
-Perhaps add a picture of your demo. Guideline: 1/2 sentences.
 
 The template design running on the Basys3 board is shown at the top of this page: eight vertical colour stripes at 640×480, in the order set by ColourStripes (black, blue, green, cyan, red, magenta, yellow and white).
 
 ## **My VGA Design Edit**
-Introduce your own design idea. Consider how complex/achievabble this might be or otherwise. Reference any research you do online (use hyperlinks).
 
 For my own design I replaced the colour stripes with a simple picture: a sunset over water. It has an orange sky, a half-circle sun sitting on the horizon, and blue water below with yellow reflection bands that get wider towards the bottom. To make it more interesting I animated the reflection so the bands drift down the screen. I sketched the picture in Paint at 640×480 first, to work out where the shapes should go.
 
 I expected this to be achievable because only ColourStripes has to change. VGASync already gives the row and column of every pixel, so the picture can be described with simple rules. The horizon at row 300 splits sky from water, the sun is every pixel within a distance of 80 from one centre point (a circle test), and the reflection is a set of bands whose width grows with the row. The animation needs one extra counter that moves the bands down every couple of frames. The main limits are that each colour channel only has 4 bits (16 levels), so colours can only be approximated, and that the logic has to stay simple enough to finish within one 25 MHz pixel clock. For background I used the [VGA article on Wikipedia](https://en.wikipedia.org/wiki/Video_Graphics_Array) for the signal timing and the [Digilent Basys3 reference manual](https://digilent.com/reference/programmable-logic/basys-3/reference-manual) for how the board's VGA port turns 4-bit colours into voltages.
 
 ### **Code Adaptation**
-Briefly show how you changed the template code to display a different image. Demonstrate your understanding. Guideline: 1-2 short paragraphs.
 
 Only ColourStripes.v was changed. VGATop, VGASync and the testbench are the same as the template, and the module name and ports were kept so everything still connects. The template compares col against eight ranges. My version uses both row and col. Rows above 300 are sky and the rest is water, the sun is a half circle of radius 80 centred on column 320 at the horizon, and the reflection is four bands, each 24 lines tall with 28 lines between them. The bands get wider towards the bottom, from a half-width of 80 pixels at the horizon to about 120 at the last line. The colours are 4-bit values: F, 8, 4 for the sky, F, D, 8 for the sun and reflection, and 5, C, E for the water.
 
@@ -70,14 +64,12 @@ wire in_refl = in_band && (adx < hw);   // hw = half-width, grows with the row
 ```
 
 ### **Simulation**
-Show how you simulated your own design. Are there any things to note? Demonstrate your understanding. Add a screenshot. Guideline: 1-2 short paragraphs.
 
 The new design was simulated with the same testbench, since only ColourStripes changed. The sync timing is identical to the template, so the new thing to check is the animation. One frame takes about 4.2 ms of simulated time (800 x 525 x 10 ns) and the bands only move one step every second frame, so the simulation has to run for about 10 ms before anything changes. The waveform shows the offset counter inside ColourStripes stepping up as the frames go by, which is what makes the reflection bands slide down.
 
 > **TODO:** Run the simulation for 10 ms or more, add the offset counter from ColourStripes to the waveform, and add a screenshot here. Edit the paragraph above if your waveform looks different.
 
 ### **Synthesis**
-Describe the synthesis & implementation outputs for your design, are there any differences to that of the original design? Guideline 1-2 short paragraphs.
 
 The new design went through the same synthesis and implementation steps. It finished with 5 synthesis warnings and 1 implementation warning, none of them a problem (for example the clock wizard's unused locked output and the unused rst input of VGASync). It uses 101 LUTs (0.49% of the chip), 45 flip-flops (0.11%), 2 DSP blocks and 1 clock manager, and timing passes with a worst slack of 28.055 ns.
 
@@ -86,7 +78,6 @@ The main difference from the template is the DSP blocks. The circle test multipl
 > **TODO:** Optional: add the stripes version's LUT and flip-flop counts for a direct comparison (re-run synthesis with the original VGAColourStripes.v), and a screenshot of the utilisation report.
 
 ### **Demonstration**
-If you get your own design working on the Basys3 board, take a picture! Guideline: 1-2 sentences.
 
 The sunset design running on the Basys3 board. The reflection bands drift down the screen, one step every two frames.
 
