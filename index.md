@@ -44,7 +44,7 @@ Implementation then fits that netlist onto the real Artix-7 chip. It optimises t
 ### **Demonstration**
 Perhaps add a picture of your demo. Guideline: 1/2 sentences.
 
-> **TODO:** Add a sentence or two. The stripes photo (1000022117.png) is already used under "Template VGA Design", so you may want to move it here.
+The template design running on the Basys3 board is shown at the top of this page: eight vertical colour stripes at 640×480, in the order set by ColourStripes (black, blue, green, cyan, red, magenta, yellow and white).
 
 ## **My VGA Design Edit**
 Introduce your own design idea. Consider how complex/achievabble this might be or otherwise. Reference any research you do online (use hyperlinks).
@@ -56,17 +56,34 @@ I expected this to be achievable because only ColourStripes has to change. VGASy
 ### **Code Adaptation**
 Briefly show how you changed the template code to display a different image. Demonstrate your understanding. Guideline: 1-2 short paragraphs.
 
-> **TODO:** Not written yet. Explain how ColourStripes was changed (sun, horizon, reflection bands, drift animation) and add a short code snippet.
+Only ColourStripes.v was changed. VGATop, VGASync and the testbench are the same as the template, and the module name and ports were kept so everything still connects. The template compares col against eight ranges. My version uses both row and col. Rows above 300 are sky and the rest is water, the sun is a half circle of radius 80 centred on column 320 at the horizon, and the reflection is four bands, each 24 lines tall with 28 lines between them. The bands get wider towards the bottom, from a half-width of 80 pixels at the horizon to about 120 at the last line. The colours are 4-bit values: F, 8, 4 for the sky, F, D, 8 for the sun and reflection, and 5, C, E for the water.
+
+The sun uses a circle test. A pixel is inside the sun if (col - 320)² + (row - 300)² is at most 80², and the test is only applied above the horizon so it shows as a half circle. For the animation, a frame counter ticks once per frame (when row and col are both 0) and moves an offset up by one every two frames. A phase counter counts 0 to 51 down the water on each line, and the reflection is drawn while the phase is below 24. Changing where the phase starts slides all the bands down together. Using a counter avoids a modulo operation, which would be expensive in hardware.
+
+```verilog
+// Sun: half circle above the horizon (radius 80, centre column 320, horizon row 300)
+wire in_sun = (row < 300) && (dist2 <= 6400);
+
+// Reflection: lit while phase < 24 (the pattern repeats every 52 lines)
+wire in_band = (row >= 300) && (phase < 24);
+wire in_refl = in_band && (adx < hw);   // hw = half-width, grows with the row
+```
 
 ### **Simulation**
 Show how you simulated your own design. Are there any things to note? Demonstrate your understanding. Add a screenshot. Guideline: 1-2 short paragraphs.
 
-> **TODO:** Not done yet. Simulate the new design and add a screenshot. The drift animation only moves once per frame, so run the simulation for several frames.
+The new design was simulated with the same testbench, since only ColourStripes changed. The sync timing is identical to the template, so the new thing to check is the animation. One frame takes about 4.2 ms of simulated time (800 x 525 x 10 ns) and the bands only move one step every second frame, so the simulation has to run for about 10 ms before anything changes. The waveform shows the offset counter inside ColourStripes stepping up as the frames go by, which is what makes the reflection bands slide down.
+
+> **TODO:** Run the simulation for 10 ms or more, add the offset counter from ColourStripes to the waveform, and add a screenshot here. Edit the paragraph above if your waveform looks different.
 
 ### **Synthesis**
 Describe the synthesis & implementation outputs for your design, are there any differences to that of the original design? Guideline 1-2 short paragraphs.
 
-> **TODO:** Not done yet. Re-run synthesis and implementation on the new design and compare its utilisation and timing with the stripes version.
+The new design went through the same synthesis and implementation steps. It finished with 5 synthesis warnings and 1 implementation warning, none of them a problem (for example the clock wizard's unused locked output and the unused rst input of VGASync). It uses 101 LUTs (0.49% of the chip), 45 flip-flops (0.11%), 2 DSP blocks and 1 clock manager, and timing passes with a worst slack of 28.055 ns.
+
+The main difference from the template is the DSP blocks. The circle test multiplies numbers (dx × dx + dy × dy), and Vivado maps multiplications onto the chip's dedicated DSP blocks. The template only compares numbers, so it needs none. This is also what triggers the DSP pipelining warnings in the DRC report. The animation counters add a few more flip-flops, but the design is still tiny, and the large slack means there is plenty of timing margin at 25 MHz.
+
+> **TODO:** Optional: add the stripes version's LUT and flip-flop counts for a direct comparison (re-run synthesis with the original VGAColourStripes.v), and a screenshot of the utilisation report.
 
 ### **Demonstration**
 If you get your own design working on the Basys3 board, take a picture! Guideline: 1-2 sentences.
