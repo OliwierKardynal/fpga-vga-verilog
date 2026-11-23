@@ -23,7 +23,11 @@ The design then went through synthesis, implementation and bitstream generation,
 ### **Template Code**
 Outline the structure and design of the Verilog code templates you were given. What do they do? Include reference to how a VGA interface works. Guideline: 2/3 short paragraphs, consider including screenshot(s).
 
-> **TODO:** Not written yet. Add 2-3 paragraphs on VGASync, ColourStripes and VGATop, and how hsync, vsync and vid_on work.
+A VGA monitor has no memory of the picture. It is sent one pixel at a time, left to right and top to bottom, about 60 times a second. Two sync signals tell it where it is: hsync marks the start of a new line and vsync marks the start of a new frame. Three colour signals (red, green and blue) say what colour the current pixel is. Around the visible 640×480 area there are extra blanking pixels and lines (the front porch, sync pulse and back porch), so each line is really 800 pixels and each frame 525 lines. With a 25 MHz pixel clock this gives about 59.5 frames per second.
+
+VGASync generates this timing with two counters. The horizontal counter counts 0 to 799 and the vertical counter goes up by one each time it wraps, counting 0 to 524. From these it produces hsync (low for 96 pixels), vsync (low for 2 lines) and vid_on, which is high only while the counters are inside the visible 640×480 area. The counters are also output as col and row, so the rest of the design knows which pixel is being drawn.
+
+ColourStripes uses col to choose the colour. The screen is split into eight bars, each 80 pixels wide, and each bar turns the red, green and blue channels fully on or off to make black, blue, green, cyan, red, magenta, yellow and white. VGATop connects the modules together and uses the Clocking Wizard to turn the 100 MHz board clock into the 25 MHz pixel clock. It also forces the colour outputs to zero whenever vid_on is low, because the monitor needs black during the blanking periods. The Basys3 board then converts each 4-bit colour value into an analogue voltage for the VGA connector.
 ### **Simulation**
 Explain the simulation process. Reference any important details, include a well-selected screenshot of the simulation. Guideline: 1/2 short paragraphs.
 
